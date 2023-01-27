@@ -41,4 +41,10 @@ function lcd_cmd(cmd){
 lcd_init();
 print("init done!");
 
-lcd_cmd("a");
+Sys.usleep(2000);
+
+GPIO.write(PIN_LCD_RS, 1); // RS low for cmd
+
+lcd_cmd(1010);
+
+GPIO.write(PIN_LCD_RS, 0); // RS low for cmd
