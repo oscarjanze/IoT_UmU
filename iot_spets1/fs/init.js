@@ -43,7 +43,7 @@ function lcd_init(){
     Sys.usleep(30*1000);
     lcd_cmd("\x38");
     Sys.usleep(30*1000);
-    lcd_cmd("\x0E");
+    lcd_cmd("\x0C");
     Sys.usleep(30*1000);
     lcd_cmd("\x01");
     Sys.usleep(30*1000);
@@ -63,7 +63,6 @@ function i2c_function() {
     let t = I2C.readRegW(i2c_h, MCP9808_I2CADDR, MCP9808_REG_AMBIENT_TEMP);
     let tempC = t & 0x0fff; // bitwise AND to strip non-temp bits
     tempC = tempC/16.0; // convert to decimal
-    //print("Temperature:", Math.round(tempC));
     temp_tempC = tempC;
 }
 
@@ -72,9 +71,7 @@ function ADC_function() {
     let adc_value = ADC.read(PIN_ADC1);
     let volts = adc_value/4095.0; // 0 - 1
     let limit = volts*40; // 0 - 40 grader
-    //print('limit:', + Math.round(limit));
     temp_limit = limit;
-
 }
 
 lcd_init();
@@ -91,7 +88,6 @@ Sys.usleep(50*10000);
 print("Init done!");
 
 lcd_cmd("\x0f");
-lcd_cmd("\x01");
 
 i2c_function();
 i2c_function();
@@ -100,11 +96,10 @@ lcd_cmd("\x01");
 
 function check_limit() {
     
-    Sys.usleep(2000*200);
-
+    //Write to display
 
     GPIO.write(PIN_LCD_RS, 1); // RS low for cmd
-    spi_param = {cs: 0, mode: 0, freq: 100000, hd: {tx_data: "Temp: " , rx_len: 0}};
+    spi_param = {cs: 0, mode: 0, freq: 100000, hd: {tx_data: " Temp: " , rx_len: 0}};
     SPI.runTransaction(spi_h, spi_param);
     GPIO.write(PIN_LCD_RS, 0); // RS low for cmd
 
@@ -130,32 +125,25 @@ function check_limit() {
 
 
 
+    //Write to last line on DOGM163
+    //
     if (temp_tempC > temp_limit){
         GPIO.toggle(PIN_LEDR);
         PWM.set(PIN_PWM, 200, 0.5);
-        //print("VARMT!");
-        //Sys.usleep(50*10000);
-        //lcd_cmd("\x01");
         GPIO.write(PIN_LCD_RS, 1); // RS low for cmd
-        spi_param = {cs: 0, mode: 0, freq: 100000, hd: {tx_data: "VARMT                  ", rx_len: 0}};
+        spi_param = {cs: 0, mode: 0, freq: 100000, hd: {tx_data: "       VARMT          ", rx_len: 0}};
         SPI.runTransaction(spi_h, spi_param);
         GPIO.write(PIN_LCD_RS, 0); // RS low for cmd
-        //Sys.usleep(50*10000);
-        //lcd_cmd("\x01");
-
     }
     else {
         PWM.set(PIN_PWM, 0, 0.5);
         GPIO.write(PIN_LEDR, 0);
         GPIO.write(PIN_LCD_RS, 1); // RS low for cmd
-        spi_param = {cs: 0, mode: 0, freq: 100000, hd: {tx_data: "                       " , rx_len: 0}};
+        spi_param = {cs: 0, mode: 0, freq: 100000, hd: {tx_data: "                      " , rx_len: 0}};
         SPI.runTransaction(spi_h, spi_param);
         GPIO.write(PIN_LCD_RS, 0); // RS low for cmd
-        //lcd_cmd("\x01");
     }
 }
-
-
 
 Timer.set(100, Timer.REPEAT, i2c_function, null);
 Timer.set(1000, Timer.REPEAT, ADC_function, null);
