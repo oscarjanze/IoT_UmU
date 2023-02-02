@@ -87,7 +87,7 @@ Sys.usleep(50*10000);
 
 print("Init done!");
 
-lcd_cmd("\x0f");
+lcd_cmd("\x0e");
 
 i2c_function();
 i2c_function();
