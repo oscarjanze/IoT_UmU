@@ -1,0 +1,11 @@
+Kod för att skicka meddelande till topic 'group8':
+
+mosquitto_pub -t group8 -m "This is a message"
+
+---
+
+Sätt upp in listener för topic 'group8':
+
+mosquitto_sub -t group8
+
+https://mongoose-os.com/docs/mongoose-os/api/net/mqtt.md
