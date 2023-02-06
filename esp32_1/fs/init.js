@@ -7,7 +7,7 @@ load('api_timer.js');
 // load('api_math.js');
 // load('api_pwm.js');
 // load('api_spi.js');
-// load('api_sys.js');
+load('api_sys.js');
 
 let PIN_LEDR = 15;      // red LED
 let PIN_LEDY = 32;      // yellow LED
@@ -19,6 +19,7 @@ let first_loop = true;
 let first_connection = true;
 let btn1_state = 0;
 let btn2_state = 0;
+let alarm = 0;
 
 
 
@@ -40,6 +41,7 @@ function updateLEDs(){
 		GPIO.write(PIN_LEDR, 0);
 		GPIO.write(PIN_LEDY, 0);
 		GPIO.write(PIN_LEDG, 0);
+		GPIO.write(PIN_LEDB, 0);
 	}
 
 	if (btn1_state === 1 && btn2_state === 0){
@@ -61,7 +63,7 @@ function updateLEDs(){
 		GPIO.write(PIN_LEDG, 1);
 
 	}
-
+	
 }
 
 MQTT.sub('group8', function(conn, topic, msg) {
@@ -70,22 +72,32 @@ MQTT.sub('group8', function(conn, topic, msg) {
 	// let command = JSON.parse(msg);
 	// btn1_state = command.btn1;
 	// btn2_state = command.btn2;
-	
-	if (msg === '"Button 1 on"'){
+
+
+	//Denna funkar utan ' tecken
+	if (msg === "Button 1 on"){
 		btn1_state = 1;
 		print("Button 1 on");
 
-	} else if (msg === '"Button 1 off"'){
+	} else if (msg === "Button 1 off"){
 		btn1_state = 0;
 		print("Button 1 off");
 
-	} else if (msg === '"Button 2 on"'){
+	} else if (msg === "Button 2 on"){
 		btn2_state = 1;
 		print("Button 2 on");
 
-	} else if (msg === '"Button 2 off"'){
+	} else if (msg === "Button 2 off"){
 		btn2_state = 0;
 		print("Button 2 off");
+
+	} else if (msg === "ALARM!"){
+		
+		alarm = 1;
+		print("ALARM!");
+
+	} else if (msg === "ALARM OFF!") {
+		alarm = 0;
 
 	} else {
 		print("Unknown command");
@@ -119,8 +131,8 @@ function min_timer_callback(){
 	let mqtt_status = MQTT.isConnected();
 	let loop_str = 'Loop #' + JSON.stringify(loop_counter++);
 
-
-  
+	updateLEDs();
+	
 
   	if (mqtt_status){
 		if (first_connection){
@@ -135,7 +147,6 @@ function min_timer_callback(){
 			first_connection = false;
 		}
 		
-		updateLEDs();
 
   	} else {
 		print(loop_str);
@@ -143,6 +154,15 @@ function min_timer_callback(){
 
 	}
 
+	if (alarm === 1){
+		//print("alarm = 1", alarm);
+		Sys.usleep(500 * 1000);
+		GPIO.toggle(PIN_LEDR);
+		GPIO.toggle(PIN_LEDY);
+		GPIO.toggle(PIN_LEDG);
+		GPIO.toggle(PIN_LEDB);
+		Sys.usleep(500 * 1000);
+	}
 }
-Timer.set(1000, Timer.REPEAT, min_timer_callback, null);
+Timer.set(200, Timer.REPEAT, min_timer_callback, null);
 
