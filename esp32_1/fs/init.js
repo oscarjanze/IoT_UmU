@@ -73,29 +73,28 @@ MQTT.sub('group8', function(conn, topic, msg) {
 	// btn1_state = command.btn1;
 	// btn2_state = command.btn2;
 
+	if(alarm === 0) {
+		if (msg === "Button 1 on"){
+			btn1_state = 1;
+			print("Button 1 on");
 
-	//Denna funkar utan ' tecken
-	if (msg === "Button 1 on"){
-		btn1_state = 1;
-		print("Button 1 on");
+		} else if (msg === "Button 1 off"){
+			btn1_state = 0;
+			print("Button 1 off");
 
-	} else if (msg === "Button 1 off"){
-		btn1_state = 0;
-		print("Button 1 off");
+		} else if (msg === "Button 2 on"){
+			btn2_state = 1;
+			print("Button 2 on");
 
-	} else if (msg === "Button 2 on"){
-		btn2_state = 1;
-		print("Button 2 on");
-
-	} else if (msg === "Button 2 off"){
-		btn2_state = 0;
-		print("Button 2 off");
-
-	} else if (msg === "ALARM!"){
-		
+		} else if (msg === "Button 2 off"){
+			btn2_state = 0;
+			print("Button 2 off");
+		}
+	}
+	
+	if (msg === "ALARM!"){
 		alarm = 1;
-		print("ALARM!");
-
+		print("ALARM!");	
 	} else if (msg === "ALARM OFF!") {
 		alarm = 0;
 
