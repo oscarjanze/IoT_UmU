@@ -20,3 +20,4 @@ GPIO.set_button_handler(PIN_BTN2, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 100, function
 
 
 print("Connected to mqtt? ", MQTT.isConnected());
+print("Hello");
