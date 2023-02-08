@@ -3,7 +3,7 @@ load('api_gpio.js');
 load('api_wifi.js');
 load('api_timer.js');
 
-let PIN_BTN1 = 14, PIN_BTN2 = 32, topic = 'group8';
+let PIN_BTN1 = 21, PIN_BTN2 = 32, topic = 'group8';
 GPIO.set_pull(PIN_BTN1, GPIO.PULL_UP);
 GPIO.set_pull(PIN_BTN2, GPIO.PULL_UP);
 
