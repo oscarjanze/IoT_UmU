@@ -39,14 +39,29 @@ print("test");
 MQTT.sub('group8', function(conn, topic, msg) {
 
     print();
-    print('Recieved MQTT Message');
-	print('Topic:', topic, ', Message:', msg);
+    //print('Recieved MQTT Message');
+	//print('Topic:', topic, ', Message:', msg);
 
     let decoded_msg = JSON.parse(msg);
     let device = decoded_msg.device;
     let tone = decoded_msg.tone;
- 
-    piezo_buzzer(tone*10);
+    //let data = decoded_msg.data;
+
+    print("Dev ",device);
+    print("Tone ",tone);
+
+    if(device === "Raspberry"){
+        //Kan inte ta emot något vettigt från raspberry.
+        //Hitta antingen delay-funktion i nodejs
+        //eller hantera lång sträng array :)
+        //piezo_buzzer(tone*10);
+    }
+
+    if(device === "esp32_1"){
+        piezo_buzzer(tone*10);
+    }
+    
+    
 
 }, null);
 
