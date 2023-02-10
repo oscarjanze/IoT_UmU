@@ -38,31 +38,28 @@ print("test");
 
 MQTT.sub('group8', function(conn, topic, msg) {
 
-    print();
+    //print(msg);
     //print('Recieved MQTT Message');
 	//print('Topic:', topic, ', Message:', msg);
 
     let decoded_msg = JSON.parse(msg);
     let device = decoded_msg.device;
     let tone = decoded_msg.tone;
+    let note;
     //let data = decoded_msg.data;
 
-    print("Dev ",device);
-    print("Tone ",tone);
-
-    if(device === "Raspberry"){
-        //Kan inte ta emot något vettigt från raspberry.
-        //Hitta antingen delay-funktion i nodejs
-        //eller hantera lång sträng array :)
-        //piezo_buzzer(tone*10);
-    }
+    //print('tone is: ', tone, 'type: ', typeof(tone));
 
     if(device === "esp32_1"){
-        piezo_buzzer(tone*10);
+        piezo_buzzer(tone);
     }
-    
-    
-
+    //
+    if(device === "esp32_2"){
+        //note = parseInt(tone);
+        print('tone is: ', tone, 'type: ', typeof(tone));
+        piezo_buzzer(tone);
+    }
+    //
 }, null);
 
 GPIO.set_button_handler(PIN_BTN1, GPIO.PULL_UP, GPIO.INT_EDGE_ANY, 100, 
@@ -78,7 +75,7 @@ GPIO.set_button_handler(PIN_BTN1, GPIO.PULL_UP, GPIO.INT_EDGE_ANY, 100,
 
 function piezo_buzzer(tone){
 
-    PWM.set(PIN_PWM, tone, 0.5);
+    PWM.set(PIN_PWM, tone*10, 0.5);
     Sys.usleep(1000 * 100);
     PWM.set(PIN_PWM, tone, 0.0);
 }
