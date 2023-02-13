@@ -58,9 +58,12 @@ MQTT.sub('group8', function(conn, topic, msg) {
     }
 
     if(device === "esp32_1"){
-        piezo_buzzer(tone*10);
+        piezo_buzzer(tone);
     }
     
+    if(device === "esp32_2"){
+        piezo_buzzer(tone);
+    }
     
 
 }, null);
