@@ -35,8 +35,34 @@ function i2c_function() {
     let reading_1 = I2C.readRegW(i2c_h, 0x70, 2);
     print("Read: ",reading_1);
     print("Write: ",write_1);
-    ton = 2*reading_1;
+
+
+
+    ton = tonart(reading_1);
 }
+
+function tonart(reading){
+    //0 - 170
+
+    if (reading > 80) {
+        //A
+        return 880;
+    }
+    else if(reading < 80 && reading > 50) {
+        //G
+        return 784;
+    }
+
+    else if(reading < 50 && reading > 20) {
+        //F
+        return 699;
+    }
+    else if(reading < 20) {
+        //E
+        return 659;
+    }
+}
+
 
 function piezo_buzzer(){
 
@@ -58,7 +84,7 @@ GPIO.set_button_handler(PIN_BTN1, GPIO.PULL_UP, GPIO.INT_EDGE_ANY, 100,
 			let res = MQTT.pub('group8', "Button 1 on", 1);
 			print('Btn 1 on, Published:', res ? 'yes' : 'no');
             temp_timer = Timer.now();
-            id = Timer.set(100, Timer.REPEAT, piezo_buzzer, null);
+            id = Timer.set(200, Timer.REPEAT, piezo_buzzer, null);
 		}
 	}, null);
 
