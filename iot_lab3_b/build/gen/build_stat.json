@@ -2,5 +2,5 @@
   "arch": "esp32",
   "platform": "esp32",
   "app_name": "iot_lab3_b",
-  "build_time_ms": 53855
+  "build_time_ms": 57101
 }

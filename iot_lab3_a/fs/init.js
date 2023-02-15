@@ -18,8 +18,6 @@ let PIN_BTN2 = 4;
 let PIN_ADC1 = 36;
 let PIN_PWM = 17;
 
-
-
 let temp_limit = 0; //temporary limit
 let temp_tempC = 0; //temporary temperature
 
@@ -36,8 +34,8 @@ function i2c_function() {
     tempC = tempC/16.0; // convert to decimal
     print("Temperature:", Math.round(tempC));
     temp_tempC = Math.round(tempC);
-    let text = JSON.stringify({device: 'esp32_A', temp: temp_tempC});
-    MQTT.pub('group8', text, 0,0);
+    let text = JSON.stringify(temp_tempC);
+    MQTT.pub('group8/temp', text, 0,0);
 }
 
 Timer.set(1000, Timer.REPEAT, i2c_function, null);
