@@ -21,21 +21,39 @@ GPIO.setup_output(PIN_LEDR, 0);
 function fan_controller(speed){
 
     if (test_mode) {    
-    PWM.set(PIN_PWM, fan_hz, fan_duty/100);
-    print("");
-    print("Fan_hz:", fan_hz, " | fan_duty:", fan_duty/100)
+        PWM.set(PIN_PWM, fan_hz, fan_duty);
+        print("");
+        print("Fan_hz:", fan_hz, " | fan_duty:", fan_duty)
     } else {
-        if (speed <= 20){
-                PWM.set(PIN_PWM, 20000, 0.5);
-        } else if (20 < speed && speed <= 40){
+        print("--Speed", speed);
+
+        let fan_effect = speed < 2 ? 2 : speed;
+        fan_effect = fan_effect / 100;
+
+        PWM.set(PIN_PWM, 25000, fan_effect);
+        print("--Fan running at", fan_effect, "capacity");
+
+
+        /* if (speed <= (max_fan / fan_steps)){
+            PWM.set(PIN_PWM, 25000, 0.02);
+
+        } else if (10 < speed && speed <= 30){
+            PWM.set(PIN_PWM, 25000, 0.20);
+
+
+        } else if (30 < speed && speed <= 40){
+            PWM.set(PIN_PWM, 25000, 0.35);
 
         } else if (40 < speed && speed <= 60){
+            PWM.set(PIN_PWM, 25000, 0.64);
+
             
         } else if (60 < speed && speed <= 80){
+            PWM.set(PIN_PWM, 25000, 0.85);
             
         } else {
-            PWM.set(PIN_PWM, 25000, 0);
-        }
+            PWM.set(PIN_PWM, 25000, 1.00);
+        } */
     }
     
 }
@@ -66,9 +84,10 @@ function mqttSubscribe() {
         // let device = decoded_msg.device;
 
         let decoded_msg = JSON.parse(msg);
-        print("--duty:", msg, "(parsed:", decoded_msg, ")");
-        speed = decoded_msg;
+        print("--effect:", msg, "(parsed:", decoded_msg, ")");
+        let speed = decoded_msg;
         fan_controller(speed);
+        
         
 
 
@@ -102,7 +121,7 @@ function mqttSubDuty() {
     MQTT.sub('group8/fan/duty', function(conn, topic, msg) {
 
         let decoded_msg = JSON.parse(msg);
-        fan_duty = decoded_msg;
+        fan_duty = decoded_msg / 100;
         print("--duty:", msg, "(fan_duty:", fan_duty, ")");
         fan_controller(0);
 
