@@ -1,6 +1,6 @@
 {
   "arch": "esp32",
   "platform": "esp32",
-  "app_name": "iot_spets2_esp32_2",
-  "build_time_ms": 50999
+  "app_name": "esp32_a",
+  "build_time_ms": 55384
 }
