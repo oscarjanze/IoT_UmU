@@ -7,14 +7,28 @@ load('api_pwm.js');
 load('api_sys.js');
 load('api_wifi.js');
 load('api_mqtt.js');
+load('api_adc.js');
 
 let PIN_BTN1 = 21;
 let PIN_PWM = 17;
 let PIN_LEDR = 33; // red LED #1
+let PIN_ADC1 = 36;
+let PIN_ADC2 = 39;
 
+
+
+
+print("ADC enabled! PIN_ADC1:", ADC.enable(PIN_ADC1));
+print("ADC enabled! PIN_ADC2:", ADC.enable(PIN_ADC2));
+
+
+let i = 0;
 let fan_hz = 25000;
 let fan_duty = 100;
 let test_mode = false;
+let light_array = [];
+let flicker_counter = 0;
+let diff = 0;
 //let store_val = 0;
 GPIO.setup_output(PIN_LEDR, 0);
 
@@ -40,8 +54,46 @@ function verifyConnection(){
 //  group8/esp32B/mikrofon
 
 
-// ADC * 2
-// read pin 1
+//  ADC * 2
+//  read pin 1
+
+function ADC_function() {
+    
+    let adc_value = ADC.read(PIN_ADC1);
+    light_array[i++] = adc_value;
+}
+
+function check_flicker() {
+    for (let i = 0; i < light_array.length - 1; i++) {
+        diff = light_array[i] - light_array[i+1];
+        if (30 < diff || -30 > diff) {
+            flicker_counter++;
+            print("Counted a flick!");
+        }   
+    }
+    if (10 <= flicker_counter) {
+        print("Shit's going hard AF rn! Lock up all the epileptic kids!");
+        print("Flickers counted: ", flicker_counter);
+    }
+    diff = 0;
+    flicker_counter = 0;
+}
+
+function print_array() {
+    
+    print("Here!");
+
+
+    //print('Light array:', + light_array);
+    for (let i = 0; i < light_array.length; i++) {
+        //print("Val:", light_array[i]);
+    }
+    print("Lenght of array:", light_array.length);
+    check_flicker();
+    light_array = [];
+    i = 0;
+}
+
 
 function mqttSubscribe() {
 
@@ -76,32 +128,7 @@ function mqttSubHz() {
 }
 
 
-
-
-
-GPIO.set_button_handler(PIN_BTN1, GPIO.PULL_UP, GPIO.INT_EDGE_ANY, 100, 
-	function(x) {
-		if (!GPIO.read(x)){
-
-            print('-- Btn pressed');
-            if (test_mode) {
-                test_mode = false;
-                print('-- Test Mode: Disabled');
-                GPIO.write(PIN_LEDR, 0);
-
-            } else {
-                test_mode = true;
-                print('-- Test Mode: Enabled');
-                GPIO.write(PIN_LEDR, 1);
-
-            }
-
-
-		} 
-	}, null);
-
-    
-
-
 let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
-//Timer.set(1000, Timer.REPEAT, fan_controller, null);
+
+Timer.set(10, Timer.REPEAT, ADC_function, null);
+Timer.set(1000, Timer.REPEAT, print_array, null);
