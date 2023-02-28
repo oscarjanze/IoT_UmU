@@ -19,47 +19,6 @@ let test_mode = false;
 GPIO.setup_output(PIN_LEDR, 0);
 
 
-
-function fan_controller(speed){
-
-    if (test_mode) {    
-        PWM.set(PIN_PWM, fan_hz, fan_duty);
-        print("");
-        print("Fan_hz:", fan_hz, " | fan_duty:", fan_duty)
-    } else {
-        print("--Speed", speed);
-
-        let fan_effect = speed < 2 ? 2 : speed;
-        fan_effect = fan_effect / 100;
-
-        PWM.set(PIN_PWM, 25000, fan_effect);
-        print("--Fan running at", fan_effect, "capacity");
-
-
-        /* if (speed <= (max_fan / fan_steps)){
-            PWM.set(PIN_PWM, 25000, 0.02);
-
-        } else if (10 < speed && speed <= 30){
-            PWM.set(PIN_PWM, 25000, 0.20);
-
-
-        } else if (30 < speed && speed <= 40){
-            PWM.set(PIN_PWM, 25000, 0.35);
-
-        } else if (40 < speed && speed <= 60){
-            PWM.set(PIN_PWM, 25000, 0.64);
-
-            
-        } else if (60 < speed && speed <= 80){
-            PWM.set(PIN_PWM, 25000, 0.85);
-            
-        } else {
-            PWM.set(PIN_PWM, 25000, 1.00);
-        } */
-    }
-    
-}
-
 function verifyConnection(){
     print("-- Checking connection to MQTT:")
     if (MQTT.isConnected()){
@@ -72,47 +31,21 @@ function verifyConnection(){
         print("---- Connection to MQTT not found. Retrying.")
     }
 }
-let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
 
+
+
+//  MQTT
+//  group8/esp32B/lightsensor
+//  group8/esp32B/movement
+//  group8/esp32B/mikrofon
+
+
+// ADC * 2
+// read pin 1
 
 function mqttSubscribe() {
 
-    MQTT.sub('group8/fan', function(conn, topic, msg) {
-
-        // let decoded_msg = JSON.parse(msg);
-
-        // //Även med init bugg kan den parsa informationen
-        // let command = decoded_msg.temp;
-        // let device = decoded_msg.device;
-
-        let decoded_msg = JSON.parse(msg);
-        print("--effect:", msg, "(parsed:", decoded_msg, ")");
-        let speed = decoded_msg;
-        fan_controller(speed);
-        
-        
-
-
-
-        /* if(device === "esp32_A"){
-            //Gör en fin övergång från 0 - 100 %
-
-            print("msg! ", command);
-            //fan_controller(command);
-            if(command >= 22 && command <= 24) {
-                //50% Duty-cycle
-                fan_controller(0.5);
-            }
-            else if(command > 25) {
-                //90% Duty-cycle 
-                fan_controller(0.9);
-            }
-            else {
-                //20% Duty-cycle
-                fan_controller(0.2);
-            }   
-        } */
-        
+    MQTT.sub('group8/', function(conn, topic, msg) {
 
     }, null);
 }
@@ -169,4 +102,6 @@ GPIO.set_button_handler(PIN_BTN1, GPIO.PULL_UP, GPIO.INT_EDGE_ANY, 100,
 
     
 
+
+let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
 //Timer.set(1000, Timer.REPEAT, fan_controller, null);
