@@ -33,6 +33,8 @@ bool  mg_rpc_send_errorf(void *, int, char *, char *);
 void  mg_send(void *, void *, int);
 void  mg_set_protocol_http_websocket(void *);
 double  mg_time(void);
+int  mgos_adc_enable(int);
+int  mgos_adc_read(int);
 void * mgos_bind(char *, void (*)(void *, int, void *, void *), void *);
 void  mgos_bitbang_write_bits_js(int, int, int, void *, int);
 void  mgos_clear_timer(int);
@@ -49,6 +51,10 @@ void * mgos_connect_http_ssl(char *, void (*)(void *, int, void *, void *), void
 void * mgos_connect_ssl(char *, void (*)(void *, int, void *, void *), void *, char *, char *, char *);
 int  mgos_debug_event_get_len(void *);
 void * mgos_debug_event_get_ptr(void *);
+void  mgos_dht_close(void *);
+void * mgos_dht_create(int, int);
+float  mgos_dht_get_humidity(void *);
+float  mgos_dht_get_temp(void *);
 void  mgos_disconnect(void *);
 void  mgos_esp_deep_sleep_d(double);
 bool  mgos_event_add_group_handler(int, void(*)(int, void *, void *), void *);
@@ -162,6 +168,8 @@ const struct mgos_ffi_export ffi_exports[] = {
   {"mg_send", mg_send},
   {"mg_set_protocol_http_websocket", mg_set_protocol_http_websocket},
   {"mg_time", mg_time},
+  {"mgos_adc_enable", mgos_adc_enable},
+  {"mgos_adc_read", mgos_adc_read},
   {"mgos_bind", mgos_bind},
   {"mgos_bitbang_write_bits_js", mgos_bitbang_write_bits_js},
   {"mgos_clear_timer", mgos_clear_timer},
@@ -178,6 +186,10 @@ const struct mgos_ffi_export ffi_exports[] = {
   {"mgos_connect_ssl", mgos_connect_ssl},
   {"mgos_debug_event_get_len", mgos_debug_event_get_len},
   {"mgos_debug_event_get_ptr", mgos_debug_event_get_ptr},
+  {"mgos_dht_close", mgos_dht_close},
+  {"mgos_dht_create", mgos_dht_create},
+  {"mgos_dht_get_humidity", mgos_dht_get_humidity},
+  {"mgos_dht_get_temp", mgos_dht_get_temp},
   {"mgos_disconnect", mgos_disconnect},
   {"mgos_esp_deep_sleep_d", mgos_esp_deep_sleep_d},
   {"mgos_event_add_group_handler", mgos_event_add_group_handler},
@@ -266,4 +278,4 @@ const struct mgos_ffi_export ffi_exports[] = {
   {"strdup", strdup},
   {"temprature_sens_read", temprature_sens_read},
 };
-const int ffi_exports_cnt = 127;
+const int ffi_exports_cnt = 133;

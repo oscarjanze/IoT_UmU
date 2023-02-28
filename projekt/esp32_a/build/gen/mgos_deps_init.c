@@ -14,6 +14,8 @@ extern bool mgos_vfs_common_init(void);
 extern bool mgos_vfs_fs_lfs_init(void);
 extern bool mgos_vfs_fs_spiffs_init(void);
 extern bool mgos_core_init(void);
+extern bool mgos_adc_init(void);
+extern bool mgos_dht_init(void);
 extern bool mgos_i2c_init(void);
 extern bool mgos_mbedtls_init(void);
 extern bool mgos_mjs_init(void);
@@ -96,11 +98,25 @@ const struct mgos_lib_info mgos_libs_info[] = {
     {.name = "core", .version = "1.0", .repo_version = "9cbb8437919696a4a8779ebb4d0cd78d99890ac6", .binary_libs = NULL, .init = mgos_core_init},
 #endif
 
+    // "adc". deps: [ "core" ]
+#if MGOS_LIB_INFO_VERSION == 1
+    {.name = "adc", .version = "1.0.0", .init = mgos_adc_init},
+#else
+    {.name = "adc", .version = "1.0.0", .repo_version = "80bd7797e66c9c9568ce11cdc9b639d28c6ae831", .binary_libs = NULL, .init = mgos_adc_init},
+#endif
+
     // "ca-bundle". deps: [ "core" ]
 #if MGOS_LIB_INFO_VERSION == 1
     {.name = "ca-bundle", .version = "1.0", .init = NULL},
 #else
     {.name = "ca-bundle", .version = "1.0", .repo_version = "82ddde1a7e95d316f0ef6a43ecfc265b0fbdaf4c", .binary_libs = NULL, .init = NULL},
+#endif
+
+    // "dht". deps: [ "core" ]
+#if MGOS_LIB_INFO_VERSION == 1
+    {.name = "dht", .version = "1.0", .init = mgos_dht_init},
+#else
+    {.name = "dht", .version = "1.0", .repo_version = "ffc9eba98f9f379737f054a812126f02ac0a71a2", .binary_libs = NULL, .init = mgos_dht_init},
 #endif
 
     // "i2c". deps: [ "core" ]
