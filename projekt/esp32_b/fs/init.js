@@ -63,6 +63,8 @@ function ADC_function() {
     light_array[i++] = adc_value;
 }
 
+//function Motion_detection() {}
+
 function check_flicker() {
     for (let i = 0; i < light_array.length - 1; i++) {
         diff = light_array[i] - light_array[i+1];
@@ -74,6 +76,7 @@ function check_flicker() {
     if (10 <= flicker_counter) {
         print("Shit's going hard AF rn! Lock up all the epileptic kids!");
         print("Flickers counted: ", flicker_counter);
+        MQTT.pub('/door/light', "Lights are flickering in TA406", 0, 0);
     }
     diff = 0;
     flicker_counter = 0;
