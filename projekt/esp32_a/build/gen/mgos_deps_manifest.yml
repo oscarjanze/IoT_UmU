@@ -1,4 +1,4 @@
-app_name: iot_spets2_esp32_2
+app_name: esp32_a
 libs:
 - name: ca-bundle
   location: https://github.com/mongoose-os-libs/ca-bundle

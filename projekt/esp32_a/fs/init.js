@@ -19,11 +19,12 @@ let PIN_BTN2 = 4;
 let PIN_ADC1 = 36;
 let PIN_PWM = 17;
 
+
 let temp_limit = 0; //temporary limit
 let temp_tempC = 0; //temporary temperature
 
-GPIO.setup_output(PIN_LEDR, 0);
 
+//GPIO.setup_output(PIN_LEDR, 0);
 //print("ADC enabled!", ADC.enable(PIN_ADC1));
 
 
@@ -33,12 +34,15 @@ function i2c_function() {
     let t = I2C.readRegW(i2c_h, MCP9808_I2CADDR, MCP9808_REG_AMBIENT_TEMP);
     let tempC = t & 0x0fff; // bitwise AND to strip non-temp bits
     tempC = tempC/16.0; // convert to decimal
-    print("Temperature:", Math.round(tempC));
+
+
+    
+    print("Temperature:", tempC);
     temp_tempC = Math.round(tempC);
-    let text = JSON.stringify(temp_tempC);
-    MQTT.pub('group8/temp', text, 0,0);
+    //let text = JSON.stringify(temp_tempC);
+    //MQTT.pub('group8/temp', text, 0,0);
 }
 
-Timer.set(1000, Timer.REPEAT, i2c_function, null);
+Timer.set(3000, Timer.REPEAT, i2c_function, null);
 //Timer.set(1000, Timer.REPEAT, ADC_function, null);
 //Timer.set(200, Timer.REPEAT, check_limit, null);
