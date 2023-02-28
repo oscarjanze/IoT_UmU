@@ -1,0 +1,11 @@
+{
+  "name": "dog-display",
+  "version": "1.0.0",
+  "description": "EA Dog-m 3.3v",
+  
+  "node-red" : {
+        "nodes": {
+            "dog-disp": "dog-disp.js"
+    }
+  }
+}
