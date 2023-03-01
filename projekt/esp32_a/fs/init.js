@@ -24,10 +24,9 @@ let MCP9808_REG_AMBIENT_TEMP = 0x05; // 0b00000101 temp data reg
 let PIN_MOIST = 14;
 let PIN_ADC_LIGHT = 36;
 let PIN_ADC_MIC = 39;
-let PIN_SOUND_TRIGGER = 4;
+let PIN_SOUND_TRIGGER = 21;
 
-GPIO.set_pull(PIN_SOUND_TRIGGER, GPIO.PULL_DOWN);
-
+GPIO.set_mode(PIN_SOUND_TRIGGER, GPIO.MODE_INPUT);
 
 print("ADC enabled! PIN_ADC_LIGHT:", ADC.enable(PIN_ADC_LIGHT));
 print("ADC enabled! PIN_ADC_MIC:", ADC.enable(PIN_ADC_MIC));
@@ -38,16 +37,23 @@ let dht = DHT.create(PIN_MOIST, DHT.DHT11);
 let temp_limit = 0; //temporary limit
 let tempC_rounded = 0; //temporary temperature
 
-GPIO.set_button_handler(PIN_SOUND_TRIGGER, GPIO.PULL_DOWN, GPIO.INT_EDGE_ANY, 100, 
-	function(x) {
-		if (!GPIO.read(x)){
-			//Check if Button is pressed
-			print('PUSHED!');
-		} else {
-			let res = MQTT.pub('group8', "Button 1 off", 1);
-			print('         RELEASED!');
-		}
-	}, null);
+function testis(){
+    print("AMERICA FUCK YEAHHHHHHHHHHHHHHHHH!");
+}
+
+
+
+
+// GPIO.set_button_handler(PIN_SOUND_TRIGGER, GPIO.PULL_DOWN, GPIO.INT_EDGE_ANY, 100, 
+// 	function(x) {
+// 		if (!GPIO.read(x)){
+// 			//Check if Button is pressed
+// 			print('PUSHED!');
+// 		} else {
+// 			let res = MQTT.pub('group8', "Button 1 off", 1);
+// 			print('         RELEASED!');
+// 		}
+// 	}, null);
 
 
 function i2c_function() {
@@ -85,7 +91,25 @@ function i2c_function() {
     let mic_value = ADC.read(PIN_ADC_MIC);
     print("MIC IS:", mic_value);
 
+    print("GPIO", GPIO.read(PIN_SOUND_TRIGGER));
+
 }
 
 Timer.set(5000, Timer.REPEAT, i2c_function, null);
 
+GPIO.set_int_handler(PIN_SOUND_TRIGGER, GPIO.INT_EDGE_NEG, function(pin) {
+    print('Pin', pin, 'got interrupt');
+}, null);
+
+GPIO.enable_int(PIN_SOUND_TRIGGER);
+
+
+function PublishMoist(value){
+    MQTT.pub('window/moist', value, 0,0);
+}
+function PublishTemp(value){
+    MQTT.pub('window/temp', value, 0,0);   
+}
+function PublishLight(value){
+    MQTT.pub('window/light', value, 0,0);
+}
