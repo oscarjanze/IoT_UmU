@@ -1,4 +1,4 @@
-// ESP32 - A
+// ESP32 - A (Window)
 load('api_timer.js');
 load('api_gpio.js');
 load('api_i2c.js');
@@ -23,18 +23,32 @@ let MCP9808_REG_AMBIENT_TEMP = 0x05; // 0b00000101 temp data reg
 // let PIN_ADC1 = 36;
 let PIN_MOIST = 14;
 let PIN_ADC_LIGHT = 36;
+let PIN_ADC_MIC = 39;
+let PIN_SOUND_TRIGGER = 4;
+
+GPIO.set_pull(PIN_SOUND_TRIGGER, GPIO.PULL_DOWN);
+
 
 print("ADC enabled! PIN_ADC_LIGHT:", ADC.enable(PIN_ADC_LIGHT));
+print("ADC enabled! PIN_ADC_MIC:", ADC.enable(PIN_ADC_MIC));
 
 
+// Setup MOIST SENSOR
 let dht = DHT.create(PIN_MOIST, DHT.DHT11);
 let temp_limit = 0; //temporary limit
 let tempC_rounded = 0; //temporary temperature
 
+GPIO.set_button_handler(PIN_SOUND_TRIGGER, GPIO.PULL_DOWN, GPIO.INT_EDGE_ANY, 100, 
+	function(x) {
+		if (!GPIO.read(x)){
+			//Check if Button is pressed
+			print('PUSHED!');
+		} else {
+			let res = MQTT.pub('group8', "Button 1 off", 1);
+			print('         RELEASED!');
+		}
+	}, null);
 
-//GPIO.setup_output(PIN_LEDR, 0);
-//print("ADC enabled!", ADC.enable(PIN_ADC1));
-let i = 0;
 
 function i2c_function() {
     print();
@@ -65,15 +79,13 @@ function i2c_function() {
     print("Temp:", tempC_rounded);
     print("AvgTemp:", (tempC_rounded+dht_temp)/2);
 
-    let adc_value = ADC.read(PIN_ADC_LIGHT);
-    print("LIGHT IS:", adc_value);
+    let light_value = ADC.read(PIN_ADC_LIGHT);
+    print("LIGHT IS:", light_value);
+
+    let mic_value = ADC.read(PIN_ADC_MIC);
+    print("MIC IS:", mic_value);
 
 }
 
-Timer.set(2000, Timer.REPEAT, i2c_function, null);
-//Timer.set(1000, Timer.REPEAT, ADC_function, null);
-//Timer.set(200, Timer.REPEAT, check_limit, null);
-
-
-
+Timer.set(5000, Timer.REPEAT, i2c_function, null);
 
