@@ -41,6 +41,7 @@ GPIO.setup_output(PIN_LEDR, 0);
 //  group8/esp32B/mikrofon      //
 //  ADC * 2                     //
 //  read pin 1                  //
+//  Events?
 
 
 
@@ -65,6 +66,7 @@ function ADC_function_1() {
     light_array[count_increment_1++] = adc_value_1;
     !ADC.enable(PIN_ADC1);
 }
+
 
 function ADC_function_2() {
     ADC.enable(PIN_ADC2);
