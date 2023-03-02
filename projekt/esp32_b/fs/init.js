@@ -69,16 +69,8 @@ function ADC_function_1() {
 function ADC_function_2() {
     ADC.enable(PIN_ADC2);
     let adc_value_2 = ADC.read(PIN_ADC2);
-    //print("ADC2 ",adc_value_2);
     sound_array[count_increment_2++] = adc_value_2;
     !ADC.enable(PIN_ADC2);
-}
-
-function Motion_detection() {
-    if (PIN_MOTION === 0) {
-        print("Motherfuckers are moving!");
-        MQTT.pub('/door/motion', "Motherfuckers are moving in TA406", 0, 0);
-    }
 }
 
 function check_flicker() {
@@ -90,14 +82,14 @@ function check_flicker() {
         if(light_array.length > 60){
             if (50 < diff || -50 > diff) {
                 flicker_counter++;
-                print("Counted a flick!");
+                //print("Counted a flick!");
             }
         }
     }
     if (10 <= flicker_counter) {
         print("Shit's going hard AF rn! Lock up all the epileptic kids!");
         print("Flickers counted: ", flicker_counter);
-        MQTT.pub('/door/light', "Lights are flickering in TA406", 0, 0);
+        MQTT.pub('group8/esp32B/lightsensor', "Lights are flickering in TA406", 0, 0);
     }
     diff = 0;
     flicker_counter = 0;
@@ -105,17 +97,16 @@ function check_flicker() {
 
 function print_array() {
     
-    print("Here!");
-    //print('Light array:', + light_array);
-    //for (let i = 0; i < sound_array.length; i++) {
-    //    print("Val sound:", sound_array[i]);
-    //}
-    //for (let i = 0; i < light_array.length; i++) {
-    //    print("Val light:", light_array[i]);
-    //}
+    //print("Here!");
     print("Lenght of light_array:", light_array.length);
     print("Lenght of sound_array:", sound_array.length);
     
+    let sound_text = JSON.stringify({text: "EVERYBODY STAY CALM", array_s: sound_array});
+    let light_text = JSON.stringify({text: "DISKOTEKA", array_l: light_array});
+
+    MQTT.pub('group8/esp32B/lightsensor', light_text,0,0);
+    MQTT.pub('group8/esp32B/mikrofon', sound_text,0,0);
+
     check_flicker();
     light_array = [];
     sound_array = [];
@@ -125,46 +116,15 @@ function print_array() {
 }
 
 
-function mqttSubscribe() {MQTT.sub('group8/', function(conn, topic, msg) {}, null);}
-//
-//
-//function mqttSubDuty() {
-//
-//    MQTT.sub('group8/fan/duty', function(conn, topic, msg) {
-//
-//        let decoded_msg = JSON.parse(msg);
-//        fan_duty = decoded_msg / 100;
-//        print("--duty:", msg, "(fan_duty:", fan_duty, ")");
-//        fan_controller(0);
-//
-//    }, null);
-//}
-//
-//function mqttSubHz() {
-//
-//    MQTT.sub('group8/fan/hz', function(conn, topic, msg) {
-//
-//        let decoded_msg = JSON.parse(msg);
-//        fan_hz = decoded_msg > 79999 ? 79999 : decoded_msg;
-//        print("--hz:", msg, "(fan_hz:", fan_hz, ")");
-//        fan_controller(0);
-//        
-//    }, null);
-//}
+//function mqttSubscribe() {MQTT.sub('group8/', function(conn, topic, msg) {}, null);}
 
 GPIO.set_int_handler(PIN_MOTION, GPIO.INT_EDGE_NEG, function(pin) {
-    let now = Timer.now();
-    let s = Timer.fmt("Motion detected %I:%M%p.! Drink Coffee!", now);
-    print(s); //Example output: "Now it's 12:01AM."
+    MQTT.pub('group8/esp32B/movement', "Motherfuckers are moving in TA406 ! Drink Coffee!", 0, 0);
 }, null);
-
 
 GPIO.enable_int(PIN_MOTION);
 
-
-
-let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
+//let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
 Timer.set(20, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
-//Timer.set(1000, Timer.REPEAT, Motion_detection, null);
