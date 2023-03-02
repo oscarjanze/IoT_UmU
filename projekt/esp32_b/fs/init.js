@@ -74,7 +74,8 @@ function ADC_function_2() {
 }
 
 function Motion_detection() {
-    if (PIN_MOTION === 1) {
+    if (PIN_MOTION === 0) {
+        print("Motherfuckers are moving!");
         MQTT.pub('/door/motion', "Motherfuckers are moving in TA406", 0, 0);
     }
 }
