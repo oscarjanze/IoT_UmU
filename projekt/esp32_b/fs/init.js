@@ -89,7 +89,7 @@ function check_flicker() {
     if (10 <= flicker_counter) {
         print("Shit's going hard AF rn! Lock up all the epileptic kids!");
         print("Flickers counted: ", flicker_counter);
-        MQTT.pub('group8/esp32B/lightsensor', "Lights are flickering in TA406", 0, 0);
+        MQTT.pub('group8/esp32B/lightsensor/alarm', "Lights are flickering in TA406", 0, 0);
     }
     diff = 0;
     flicker_counter = 0;
