@@ -15,6 +15,10 @@ let PIN_LEDR = 33; // red LED #1
 let PIN_ADC1 = 36;
 let PIN_ADC2 = 39;
 let PIN_MIC_GATE = 21;
+let PIN_MOTION = 16;
+
+
+GPIO.set_mode(PIN_MOTION, GPIO.MODE_INPUT);
 
 print("ADC enabled! PIN_ADC1:", ADC.enable(PIN_ADC1));
 print("ADC enabled! PIN_ADC2:", ADC.enable(PIN_ADC2));
@@ -69,8 +73,11 @@ function ADC_function_2() {
     !ADC.enable(PIN_ADC2);
 }
 
-
-//function Motion_detection() {}
+function Motion_detection() {
+    if (PIN_MOTION === 1) {
+        MQTT.pub('/door/motion', "Motherfuckers are moving in TA406", 0, 0);
+    }
+}
 
 function check_flicker() {
     for (let i = 1; i < light_array.length-1; i++) {
@@ -148,3 +155,4 @@ let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
 Timer.set(20, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
+Timer.set(1000, Timer.REPEAT, Motion_detection, null);
