@@ -77,7 +77,9 @@ function ADC_function_2() {
 }
 
 
-//function Motion_detection() {}
+function Motion_detection() {
+    
+}
 
 function check_flicker() {
     for (let i = 1; i < light_array.length-1; i++) {
@@ -160,3 +162,4 @@ let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
 Timer.set(20, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
+Timer.set(1000, Timer.REPEAT, Motion_detection, null);
