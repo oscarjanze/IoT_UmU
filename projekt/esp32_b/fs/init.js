@@ -18,7 +18,8 @@ let PIN_MIC_GATE = 21;
 let PIN_MOTION = 16;
 
 
-GPIO.set_mode(PIN_MOTION, GPIO.MODE_INPUT);
+//GPIO.set_mode(PIN_MOTION, GPIO.PULL);
+GPIO.setup_input(PIN_MOTION, GPIO.PULL_UP);
 
 print("ADC enabled! PIN_ADC1:", ADC.enable(PIN_ADC1));
 print("ADC enabled! PIN_ADC2:", ADC.enable(PIN_ADC2));
@@ -151,9 +152,19 @@ function mqttSubscribe() {MQTT.sub('group8/', function(conn, topic, msg) {}, nul
 //    }, null);
 //}
 
+GPIO.set_int_handler(PIN_MOTION, GPIO.INT_EDGE_NEG, function(pin) {
+    let now = Timer.now();
+    let s = Timer.fmt("Motion detected %I:%M%p.! Drink Coffee!", now);
+    print(s); //Example output: "Now it's 12:01AM."
+}, null);
+
+
+GPIO.enable_int(PIN_MOTION);
+
+
 
 let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
 Timer.set(20, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
-Timer.set(1000, Timer.REPEAT, Motion_detection, null);
+//Timer.set(1000, Timer.REPEAT, Motion_detection, null);
