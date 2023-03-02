@@ -9,16 +9,12 @@ load('api_sys.js');
 load('api_wifi.js');
 load('api_mqtt.js');
 
-
 let PIN_BTN1 = 21;
 let PIN_PWM = 17;
 let PIN_LEDR = 33; // red LED #1
 let PIN_ADC1 = 36;
 let PIN_ADC2 = 39;
 let PIN_MIC_GATE = 21;
-
-
-
 
 print("ADC enabled! PIN_ADC1:", ADC.enable(PIN_ADC1));
 print("ADC enabled! PIN_ADC2:", ADC.enable(PIN_ADC2));
@@ -56,9 +52,6 @@ function verifyConnection(){
         print("---- Connection to MQTT not found. Retrying.")
     }
 }
-
-
-
 
 function ADC_function_1() {
     ADC.enable(PIN_ADC1);
@@ -123,12 +116,7 @@ function print_array() {
 }
 
 
-function mqttSubscribe() {
-
-    MQTT.sub('group8/', function(conn, topic, msg) {
-
-    }, null);
-}
+function mqttSubscribe() {MQTT.sub('group8/', function(conn, topic, msg) {}, null);}
 //
 //
 //function mqttSubDuty() {
