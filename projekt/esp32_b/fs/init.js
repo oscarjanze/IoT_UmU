@@ -9,16 +9,17 @@ load('api_sys.js');
 load('api_wifi.js');
 load('api_mqtt.js');
 
-
 let PIN_BTN1 = 21;
 let PIN_PWM = 17;
 let PIN_LEDR = 33; // red LED #1
 let PIN_ADC1 = 36;
 let PIN_ADC2 = 39;
 let PIN_MIC_GATE = 21;
+let PIN_MOTION = 16;
 
 
-
+//GPIO.set_mode(PIN_MOTION, GPIO.PULL);
+GPIO.setup_input(PIN_MOTION, GPIO.PULL_UP);
 
 print("ADC enabled! PIN_ADC1:", ADC.enable(PIN_ADC1));
 print("ADC enabled! PIN_ADC2:", ADC.enable(PIN_ADC2));
@@ -41,6 +42,7 @@ GPIO.setup_output(PIN_LEDR, 0);
 //  group8/esp32B/mikrofon      //
 //  ADC * 2                     //
 //  read pin 1                  //
+//  Events?
 
 
 
@@ -56,9 +58,6 @@ function verifyConnection(){
     }
 }
 
-
-
-
 function ADC_function_1() {
     ADC.enable(PIN_ADC1);
     let adc_value_1 = ADC.read(PIN_ADC1);
@@ -66,16 +65,13 @@ function ADC_function_1() {
     !ADC.enable(PIN_ADC1);
 }
 
+
 function ADC_function_2() {
     ADC.enable(PIN_ADC2);
     let adc_value_2 = ADC.read(PIN_ADC2);
-    //print("ADC2 ",adc_value_2);
     sound_array[count_increment_2++] = adc_value_2;
     !ADC.enable(PIN_ADC2);
 }
-
-
-//function Motion_detection() {}
 
 function check_flicker() {
     for (let i = 1; i < light_array.length-1; i++) {
@@ -86,14 +82,14 @@ function check_flicker() {
         if(light_array.length > 60){
             if (50 < diff || -50 > diff) {
                 flicker_counter++;
-                print("Counted a flick!");
+                //print("Counted a flick!");
             }
         }
     }
     if (10 <= flicker_counter) {
         print("Shit's going hard AF rn! Lock up all the epileptic kids!");
         print("Flickers counted: ", flicker_counter);
-        MQTT.pub('/door/light', "Lights are flickering in TA406", 0, 0);
+        MQTT.pub('group8/esp32B/lightsensor/alarm', "Lights are flickering in TA406", 0, 0);
     }
     diff = 0;
     flicker_counter = 0;
@@ -101,17 +97,16 @@ function check_flicker() {
 
 function print_array() {
     
-    print("Here!");
-    //print('Light array:', + light_array);
-    //for (let i = 0; i < sound_array.length; i++) {
-    //    print("Val sound:", sound_array[i]);
-    //}
-    //for (let i = 0; i < light_array.length; i++) {
-    //    print("Val light:", light_array[i]);
-    //}
+    //print("Here!");
     print("Lenght of light_array:", light_array.length);
     print("Lenght of sound_array:", sound_array.length);
     
+    let sound_text = JSON.stringify({text: "EVERYBODY STAY CALM", array_s: sound_array});
+    let light_text = JSON.stringify({text: "DISKOTEKA", array_l: light_array});
+
+    MQTT.pub('group8/esp32B/lightsensor', light_text,0,0);
+    MQTT.pub('group8/esp32B/mikrofon', sound_text,0,0);
+
     check_flicker();
     light_array = [];
     sound_array = [];
@@ -121,40 +116,15 @@ function print_array() {
 }
 
 
-function mqttSubscribe() {
+//function mqttSubscribe() {MQTT.sub('group8/', function(conn, topic, msg) {}, null);}
 
-    MQTT.sub('group8/', function(conn, topic, msg) {
+GPIO.set_int_handler(PIN_MOTION, GPIO.INT_EDGE_NEG, function(pin) {
+    MQTT.pub('group8/esp32B/movement', "Motherfuckers are moving in TA406 ! Drink Coffee!", 0, 0);
+}, null);
 
-    }, null);
-}
-//
-//
-//function mqttSubDuty() {
-//
-//    MQTT.sub('group8/fan/duty', function(conn, topic, msg) {
-//
-//        let decoded_msg = JSON.parse(msg);
-//        fan_duty = decoded_msg / 100;
-//        print("--duty:", msg, "(fan_duty:", fan_duty, ")");
-//        fan_controller(0);
-//
-//    }, null);
-//}
-//
-//function mqttSubHz() {
-//
-//    MQTT.sub('group8/fan/hz', function(conn, topic, msg) {
-//
-//        let decoded_msg = JSON.parse(msg);
-//        fan_hz = decoded_msg > 79999 ? 79999 : decoded_msg;
-//        print("--hz:", msg, "(fan_hz:", fan_hz, ")");
-//        fan_controller(0);
-//        
-//    }, null);
-//}
+GPIO.enable_int(PIN_MOTION);
 
-
-let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
+//let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
 Timer.set(20, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
