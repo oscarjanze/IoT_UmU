@@ -132,7 +132,6 @@ function check_flicker() {
     diff = 0;
     flicker_counter = 0;
 }
-
 function print_array() {
     
     //print("Here!");
