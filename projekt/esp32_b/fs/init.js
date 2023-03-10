@@ -16,6 +16,8 @@ let PIN_ADC2 = 39;
 let PIN_MIC_GATE = 21;
 let PIN_MOTION = 16;
 
+GPIO.setup_input(PIN_MOTION, GPIO.PULL_UP);
+
 let light_samples = [];         // Array of light samples
 let lightsample_timer;          // Used as pointer to timer
 let start_timer;                // Used as pointer to timer
