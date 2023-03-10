@@ -128,3 +128,7 @@ GPIO.enable_int(PIN_MOTION);
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
 Timer.set(20, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
+
+
+
+[{"id":"1dcee7c93ef6b81e","type":"ui_template","z":"44908087.da8e9","group":"93fb734b1b23203e","name":"StaticImageCam2Poort","order":3,"width":0,"height":0,"format":"<body>\n\n<p>\n<a href=\"/grabcam2.jpg\" target=\"_blank\">\n<img border=\"0\" alt=\"CamVoorGrab\" src=\"/grabcam2.jpg\" width=\"1000\"  height=\"800\">\n</a>\n</p>","storeOutMessages":true,"fwdInMessages":true,"resendOnRefresh":false,"templateScope":"local","className":"","x":1010,"y":700,"wires":[[]]},{"id":"93fb734b1b23203e","type":"ui_group","name":"Cam 2 Poort Grab","tab":"5afa5e126e0accce","order":1,"disp":true,"width":"19","collapse":false},{"id":"5afa5e126e0accce","type":"ui_tab","name":"Cam 2 Grab","icon":"icofont-camera-alt","order":34,"disabled":false,"hidden":false}]

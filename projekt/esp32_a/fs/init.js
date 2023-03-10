@@ -88,7 +88,6 @@ function updateLightsampleTimeMs(){
     }
 }
 
-print
 start_timer = Timer.set(1000, Timer.REPEAT, startDelay, null);
 
 
