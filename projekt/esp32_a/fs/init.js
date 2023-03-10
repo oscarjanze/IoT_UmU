@@ -88,7 +88,6 @@ function updateLightsampleTimeMs(){
     }
 }
 
-print
 start_timer = Timer.set(1000, Timer.REPEAT, startDelay, null);
 
 
@@ -111,7 +110,7 @@ function PublishTemp(){
     MQTT.pub('group8/esp32A/temp', text, 0,0);   
 }
 function PublishLight(){
-    let text = JSON.stringify(light_samples);
+    let text = JSON.stringify({data: light_samples});
     MQTT.pub('group8/esp32A/light', text, 0,0);
     light_samples = [];
 }

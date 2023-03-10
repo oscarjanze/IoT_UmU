@@ -1,27 +1,86 @@
 // ESP32 - B
-
 load('api_timer.js');
 load('api_gpio.js');
 load('api_i2c.js');
-load('api_adc.js');
 load('api_pwm.js');
-load('api_sys.js');
 load('api_wifi.js');
 load('api_mqtt.js');
+load('api_math.js');
+load('api_adc.js');
 
 let PIN_BTN1 = 21;
 let PIN_PWM = 17;
 let PIN_LEDR = 33; // red LED #1
-let PIN_ADC1 = 36;
+let PIN_ADC_LIGHT = 36;
 let PIN_ADC2 = 39;
 let PIN_MIC_GATE = 21;
 let PIN_MOTION = 16;
+
+let light_samples = [];         // Array of light samples
+let lightsample_timer;          // Used as pointer to timer
+let start_timer;                // Used as pointer to timer
+let lightsample_time_ms = 7;    // Light sample wait period (timer)
+
+
+function startDelay(){
+
+    if ( MQTT.isConnected() ){
+
+        print("MQTT not connected.");
+        print("Retrying...");
+        print("");
+
+    } else {
+        Timer.del(start_timer);
+
+        for (let i = 0; i <= 50 ; i++){
+            print("");
+        }
+        print("System Start");
+    
+        lightsample_timer = Timer.set(lightsample_time_ms, Timer.REPEAT, sampleLight, null);
+        Timer.set(1000, Timer.REPEAT, sendSample, null);
+    }
+}
+
+
+function sampleLight(){
+    light_samples.push( ADC.read(PIN_ADC_LIGHT) );
+}
+
+function sendSample(){
+    Timer.del(lightsample_timer);
+    print();
+    print("Light samples:", light_samples.length);
+    updateLightsampleTimeMs()
+
+    PublishLight();
+
+    lightsample_timer = Timer.set(lightsample_time_ms, Timer.REPEAT, sampleLight, null);
+}
+
+function updateLightsampleTimeMs(){
+    if(light_samples.length < 120 && lightsample_time_ms > 1){
+        lightsample_time_ms--;
+        print("Increasing sample speed: ", lightsample_time_ms)
+    } else if (light_samples.length > 140){
+        lightsample_time_ms++;
+        print("Decreasing sample speed: ", lightsample_time_ms)
+    }
+}
+
+start_timer = Timer.set(1000, Timer.REPEAT, startDelay, null);
+
+function PublishLight(){
+    let text = JSON.stringify({data: light_samples});
+    MQTT.pub('group8/esp32B/light', text, 0,0);
+    light_samples = [];
+}
 
 
 //GPIO.set_mode(PIN_MOTION, GPIO.PULL);
 GPIO.setup_input(PIN_MOTION, GPIO.PULL_UP);
 
-print("ADC enabled! PIN_ADC1:", ADC.enable(PIN_ADC1));
 print("ADC enabled! PIN_ADC2:", ADC.enable(PIN_ADC2));
 
 
@@ -35,34 +94,11 @@ let diff = 0;
 GPIO.set_mode(PIN_MIC_GATE, GPIO.MODE_INPUT);
 GPIO.setup_output(PIN_LEDR, 0);
 
-//              MÅL             //
-//              MQTT            //
-//  group8/esp32B/lightsensor   //
-//  group8/esp32B/movement      //
-//  group8/esp32B/mikrofon      //
-//  ADC * 2                     //
-//  read pin 1                  //
-//  Events?
-
-
-
-
-function verifyConnection(){
-    print("-- Checking connection to MQTT:");
-    if (MQTT.isConnected()){
-        print("---- Connection to MQTT found.");
-        mqttSubscribe();
-        Timer.del(verifyConnectionTimer);
-    } else {
-        print("---- Connection to MQTT not found. Retrying.")
-    }
-}
-
 function ADC_function_1() {
-    ADC.enable(PIN_ADC1);
-    let adc_value_1 = ADC.read(PIN_ADC1);
+    ADC.enable(PIN_ADC_LIGHT);
+    let adc_value_1 = ADC.read(PIN_ADC_LIGHT);
     light_array[count_increment_1++] = adc_value_1;
-    !ADC.enable(PIN_ADC1);
+    !ADC.enable(PIN_ADC_LIGHT);
 }
 
 
@@ -126,5 +162,5 @@ GPIO.enable_int(PIN_MOTION);
 
 //let verifyConnectionTimer = Timer.set(1000, Timer.REPEAT, verifyConnection, null);
 Timer.set(10, Timer.REPEAT, ADC_function_1, null);
-Timer.set(20, Timer.REPEAT, ADC_function_2, null);
+Timer.set(5, Timer.REPEAT, ADC_function_2, null);
 Timer.set(1000, Timer.REPEAT, print_array, null);
