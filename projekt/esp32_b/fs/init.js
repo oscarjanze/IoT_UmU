@@ -73,27 +73,27 @@ function ADC_function_2() {
     !ADC.enable(PIN_ADC2);
 }
 
-function check_flicker() {
-    for (let i = 1; i < light_array.length-1; i++) {
-        //print("Whats this?: ",light_array[i], light_array[i-1]);
-        diff = light_array[i] - light_array[i-1];
-
-        //print("diff:",diff);
-        if(light_array.length > 60){
-            if (50 < diff || -50 > diff) {
-                flicker_counter++;
-                //print("Counted a flick!");
-            }
-        }
-    }
-    if (10 <= flicker_counter) {
-        print("Shit's going hard AF rn! Lock up all the epileptic kids!");
-        print("Flickers counted: ", flicker_counter);
-        MQTT.pub('group8/esp32B/lightsensor/alarm', "Lights are flickering in TA406", 0, 0);
-    }
-    diff = 0;
-    flicker_counter = 0;
-}
+//function check_flicker() {
+//    for (let i = 1; i < light_array.length-1; i++) {
+//        //print("Whats this?: ",light_array[i], light_array[i-1]);
+//        diff = light_array[i] - light_array[i-1];
+//
+//        //print("diff:",diff);
+//        if(light_array.length > 60){
+//            if (50 < diff || -50 > diff) {
+//                flicker_counter++;
+//                //print("Counted a flick!");
+//            }
+//        }
+//    }
+//    if (10 <= flicker_counter) {
+//        print("Shit's going hard AF rn! Lock up all the epileptic kids!");
+//        print("Flickers counted: ", flicker_counter);
+//        MQTT.pub('group8/esp32B/lightsensor/alarm', "Lights are flickering in TA406", 0, 0);
+//    }
+//    diff = 0;
+//    flicker_counter = 0;
+//}
 
 function print_array() {
     
@@ -107,7 +107,7 @@ function print_array() {
     MQTT.pub('group8/esp32B/lightsensor', light_text,0,0);
     MQTT.pub('group8/esp32B/mikrofon', sound_text,0,0);
 
-    check_flicker();
+    //check_flicker();
     light_array = [];
     sound_array = [];
     count_increment_1 = 0;
