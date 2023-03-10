@@ -17,8 +17,6 @@ let PIN_ADC2 = 39;
 let PIN_MIC_GATE = 21;
 let PIN_MOTION = 16;
 
-GPIO.setup_input(PIN_MOTION, GPIO.PULL_UP);
-
 
 //GPIO.set_mode(PIN_MOTION, GPIO.PULL);
 GPIO.setup_input(PIN_MOTION, GPIO.PULL_UP);
